@@ -1,0 +1,21 @@
+name: audit-windows-build
+on:
+  pull_request:
+    paths: [".github/workflows/audit-windows.yml"]
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Install pinned compiler toolchain
+        run: rustup toolchain install 1.99.0 --profile minimal
+      - name: Build current compiler for local reproduction
+        run: cargo +1.99.0 build --manifest-path compiler/Cargo.toml -p hyb
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hyb-audit-windows
+          path: compiler/target/debug/hyb.exe
+          retention-days: 1
